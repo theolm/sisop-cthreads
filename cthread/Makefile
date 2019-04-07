@@ -15,7 +15,7 @@ LIB_DIR=./lib
 INC_DIR=./include
 BIN_DIR=./bin
 SRC_DIR=./src
-TARGET=./bin/teste
+TARGETS_O= ./bin/library.o
 CFLAGS = -Wall
 
 all: library libcthread
@@ -23,8 +23,8 @@ all: library libcthread
 libcthread:
 	ar crs $(LIB_DIR)/libcthread.a $(BIN_DIR)/library.o
 
-library: $(LIB_DIR)/support.o $(SRC_DIR)/lib.c
+library: $(BIN_DIR)/support.o $(SRC_DIR)/lib.c
 	$(CC) -c $(SRC_DIR)/lib.c -o $(BIN_DIR)/library.o $(CFLAGS)
 
 clean:
-	rm -rf $(LIB_DIR)/*.a $(BIN_DIR)/*.o $(SRC_DIR)/*~ $(INC_DIR)/*~ *~
+	rm -rf $(TARGETS_O) $(LIB_DIR)/*
