@@ -16,12 +16,12 @@ INC_DIR=./include
 BIN_DIR=./bin
 SRC_DIR=./src
 TARGETS_O= ./bin/library.o
-CFLAGS = -Wall
+CFLAGS = -Wall -m32
 
 all: library libcthread
 
-libcthread:
-	ar crs $(LIB_DIR)/libcthread.a $(BIN_DIR)/library.o
+libcthread: $(BIN_DIR)/support.o $(BIN_DIR)/library.o
+	ar crs $(LIB_DIR)/libcthread.a $(BIN_DIR)/library.o $(BIN_DIR)/support.o
 
 library: $(BIN_DIR)/support.o $(SRC_DIR)/lib.c
 	$(CC) -c $(SRC_DIR)/lib.c -o $(BIN_DIR)/library.o $(CFLAGS)

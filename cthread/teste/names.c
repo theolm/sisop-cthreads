@@ -7,7 +7,6 @@
 #include <stdio.h>
 
 int main(int argc, char *argv[]) {
-
     printf("Iniciou main, teste de nomes dos integrantes\n\n");
 
     char integrantes[100];
@@ -26,4 +25,5 @@ int main(int argc, char *argv[]) {
 
     printf("\n%d\n", result);
 
+    exit(0);
 }
