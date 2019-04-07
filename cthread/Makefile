@@ -18,13 +18,13 @@ SRC_DIR=./src
 TARGET=./bin/teste
 CFLAGS = -Wall
 
-all: lib libcthread
+all: library libcthread
 
 libcthread:
-	ar crs $(BIN_DIR)/libcthread.a $(BIN_DIR)/lib.o
+	ar crs $(LIB_DIR)/libcthread.a $(BIN_DIR)/library.o
 
-lib: $(LIB_DIR)/support.o $(SRC_DIR)/lib.c
-	$(CC) -c $(SRC_DIR)/lib.c -o $(BIN_DIR)/lib.o $(CFLAGS)
+library: $(LIB_DIR)/support.o $(SRC_DIR)/lib.c
+	$(CC) -c $(SRC_DIR)/lib.c -o $(BIN_DIR)/library.o $(CFLAGS)
 
 clean:
 	rm -rf $(LIB_DIR)/*.a $(BIN_DIR)/*.o $(SRC_DIR)/*~ $(INC_DIR)/*~ *~
