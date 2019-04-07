@@ -7,6 +7,7 @@
 
 
 int ccreate (void* (*start)(void*), void *arg, int prio) {
+    printf("teste");
 	return -1;
 }
 

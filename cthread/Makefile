@@ -15,19 +15,16 @@ LIB_DIR=./lib
 INC_DIR=./include
 BIN_DIR=./bin
 SRC_DIR=./src
+TARGET=./bin/teste
+CFLAGS = -Wall
 
-all: regra1 regra2 regran
+all: lib libcthread
 
-regra1: #dependências para a regra1
-	$(CC) -o $(BIN_DIR)regra1 $(SRC_DIR)regra1.c -Wall
+libcthread:
+	ar crs $(BIN_DIR)/libcthread.a $(BIN_DIR)/lib.o
 
-regra2: #dependências para a regra2
-	$(CC) -o $(BIN_DIR)regra2 $(SRC_DIR)regra2.c -Wall
-
-regran: #dependências para a regran
-	$(CC) -o $(BIN_DIR)regran $(SRC_DIR)regran.c -Wall
+lib: $(LIB_DIR)/support.o $(SRC_DIR)/lib.c
+	$(CC) -c $(SRC_DIR)/lib.c -o $(BIN_DIR)/lib.o $(CFLAGS)
 
 clean:
 	rm -rf $(LIB_DIR)/*.a $(BIN_DIR)/*.o $(SRC_DIR)/*~ $(INC_DIR)/*~ *~
-
-
