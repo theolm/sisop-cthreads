@@ -1,7 +1,9 @@
 # sisop-cthreads
 
 ### MakeFile
-Cada c file precisa ter uma regra adicional
+Cada c file precisa ter uma regra adicional, tambem precisa adicionar o .o de cada regra ao TARGETS_O para que a regra clean limpe todos os arquivos gerados no bin (exeto pelo support.o).
+
+A regra all deve conter todas as regras para que seja possivel gerar todos os .o e ligalos na lib estatica libcthread.a
 
 Exemplo:
 ```sh
@@ -10,55 +12,21 @@ LIB_DIR=./lib
 INC_DIR=./include
 BIN_DIR=./bin
 SRC_DIR=./src
-TARGET=./bin/teste
+TARGETS_O= ./bin/library.o
 CFLAGS = -Wall
 
-#adicionar no all todos os arquivos  a serem compilados e suas dependencias
-all : teste
+all: library libcthread
 
-teste : teste.o
-        gcc -o teste teste.o 
+libcthread:
+	ar crs $(LIB_DIR)/libcthread.a $(BIN_DIR)/library.o
 
-teste.o : teste.c
-        gcc -c teste.c
+library: $(BIN_DIR)/support.o $(SRC_DIR)/lib.c
+	$(CC) -c $(SRC_DIR)/lib.c -o $(BIN_DIR)/library.o $(CFLAGS)
 
-clean :
-        rm teste *.o
-
-all: teste
-
-
-# Comando basico
-regra: dependencias compilador -o file_de_saida file_de_entrada 
+clean:
+	rm -rf $(TARGETS_O) $(LIB_DIR)/*
 ```
 
-Exemplo completo (sem variáveis de ambiente):
-```sh
-edit : main.o kbd.o command.o display.o \
-       insert.o search.o files.o utils.o
-        gcc -o edit main.o kbd.o command.o display.o \
-                   insert.o search.o files.o utils.o
-
-main.o : main.c defs.h
-        gcc -c main.c
-kbd.o : kbd.c defs.h command.h
-        gcc -c kbd.c
-command.o : command.c defs.h command.h
-        gcc -c command.c
-display.o : display.c defs.h buffer.h
-        gcc -c display.c
-insert.o : insert.c defs.h buffer.h
-        gcc -c insert.c
-search.o : search.c defs.h buffer.h
-        gcc -c search.c
-files.o : files.c defs.h buffer.h command.h
-        gcc -c files.c
-utils.o : utils.c defs.h
-        gcc -c utils.c
-clean :
-        rm edit main.o kbd.o command.o display.o \
-           insert.o search.o files.o utils.o
-```
 
 Flags de compilação
 ```sh
