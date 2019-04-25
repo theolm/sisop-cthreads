@@ -17,7 +17,7 @@ struct	sFilaNode2 {
 struct sFila2 {
 	struct	sFilaNode2 *it;		// Iterador para varrer a lista
 	struct	sFilaNode2 *first;	// Primeiro elemento da lista
-	struct	sFilaNode2 *last;	// Último elemento da lista
+	struct	sFilaNode2 *last;	// Último e
 };
 
 typedef struct sFilaNode2	NODE2;
