@@ -15,16 +15,19 @@ LIB_DIR=./lib
 INC_DIR=./include
 BIN_DIR=./bin
 SRC_DIR=./src
-TARGETS_O= ./bin/library.o
+TARGETS_O= ./bin/library.o ./bin/fifo_manager.o
 CFLAGS = -Wall -m32
 
-all: library libcthread
+all: fifo_manager library libcthread
 
-libcthread: $(BIN_DIR)/support.o $(BIN_DIR)/library.o
-	ar crs $(LIB_DIR)/libcthread.a $(BIN_DIR)/library.o $(BIN_DIR)/support.o
+libcthread: $(BIN_DIR)/support.o $(BIN_DIR)/library.o $(BIN_DIR)/fifo_manager.o
+	ar crs $(LIB_DIR)/libcthread.a $(BIN_DIR)/library.o $(BIN_DIR)/support.o $(BIN_DIR)/fifo_manager.o
 
-library: $(BIN_DIR)/support.o $(SRC_DIR)/lib.c
+library: $(BIN_DIR)/support.o $(BIN_DIR)/fifo_manager.o $(SRC_DIR)/lib.c
 	$(CC) -c $(SRC_DIR)/lib.c -o $(BIN_DIR)/library.o $(CFLAGS)
+
+fifo_manager: $(BIN_DIR)/support.o $(SRC_DIR)/fifo_manager.c
+	$(CC) -c $(SRC_DIR)/fifo_manager.c -o $(BIN_DIR)/fifo_manager.o $(CFLAGS)
 
 clean:
 	rm -rf $(TARGETS_O) $(LIB_DIR)/*
