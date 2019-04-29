@@ -8,12 +8,14 @@
 #include "../include/cdata.h"
 #include "../include/fifo_manager.h"
 #include "../include/defines.h"
+#include "../include/escalonador.h"
 
 /***
  * FUNCOES DA CTHREADS.H
 ***/
 int ccreate(void *(*start)(void *), void *arg, int prio) {
     int status = 0;
+    int control = 0;
 
     status = status - initFifosIfNeeded();
     status = status - createMainThreadIfNeeded();
@@ -32,9 +34,19 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
     new_thread.context.uc_stack.ss_size = sizeof(new_thread.stack);
     new_thread.prio = prio; //Salva prioridade na estrutura
 
-    makecontext(&new_thread.context, (void (*)(void)) start, 0);
+    makecontext(&new_thread.context, (void (*)(void)) start, 1);
+
+    getcontext(&main_context);
+    if (!control) {
+        control = 1;
+        printf("Antes do set context");
+        setcontext(&new_thread.context);
+    }
+    printf("Depois do set context");
 
     status = status - addThreadToFifo(&new_thread);
+
+    //dispatcher();
 
     return status;
 }

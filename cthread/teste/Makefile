@@ -4,7 +4,7 @@ INC_DIR=../include
 BIN_DIR=../bin
 SRC_DIR=./
 TARGETS= names ccreate_test
-CFLAGS = -Wall -m32
+CFLAGS = -Wall -m32 -DDEBUG
 
 all: names ccreate_test
 

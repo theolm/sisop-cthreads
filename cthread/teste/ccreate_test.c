@@ -5,6 +5,7 @@
 #include "../include/support.h"
 #include "../include/cthread.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 void* func1(void *arg) {
     int i;
@@ -15,9 +16,12 @@ void* func1(void *arg) {
 
 int main(int argc, char *argv[]) {
     int i;
-    int id1 = ccreate(func1, (void *)&i, 0);
-    int id2 = ccreate(func1, (void *)&i, 0);
-    int id3 = ccreate(func1, (void *)&i, 0);
+    ccreate(func1, (void *)&i, 0);
+    printf("\nacabou 1 create!\n");
+    ccreate(func1, (void *)&i, 0);
+    printf("\nacabou 2 create!\n");
+    //int id2 = ccreate(func1, (void *)&i, 0);
+    //int id3 = ccreate(func1, (void *)&i, 0);
 
     exit(0);
 }

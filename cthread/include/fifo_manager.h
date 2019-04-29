@@ -21,6 +21,7 @@ FILA2 fifoHigh;
 int initFifosIfNeeded();
 int addThreadToFifo(struct s_TCB* newThread);
 int createMainThreadIfNeeded();
+int initMain();
 
 
 #endif //CTHREAD_FIFO_MANAGER_H
