@@ -3,25 +3,35 @@
 #include <string.h>
 #include <ucontext.h>
 #include <bits/sigstack.h>
+#include <stdlib.h>
 #include "../include/support.h"
 #include "../include/cthread.h"
 #include "../include/cdata.h"
 #include "../include/fifo_manager.h"
 #include "../include/defines.h"
 #include "../include/escalonador.h"
+#include "../include/setup_lib.h"
+
 
 /***
  * FUNCOES DA CTHREADS.H
 ***/
+int isInit = -1;
+
+int teste() {
+    int i;
+    for (i =0; i <=5; i++ ) {
+        printf("TESTE\n");
+    }
+}
+
 int ccreate(void *(*start)(void *), void *arg, int prio) {
+    if (isInit == -1) {
+        isInit = 0;
+        initLibrary();
+    }
+
     int status = 0;
-    int control = 0;
-
-    status = status - initFifosIfNeeded();
-    status = status - createMainThreadIfNeeded();
-
-    /*Contexto da mainThread usada para o uc_link -> para onde voltar quando acabar o processo??? escalonador?*/
-    ucontext_t main_context;
 
     /*Contexto e estrutura da thead nova*/
     struct s_TCB new_thread;
@@ -29,24 +39,48 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
     new_thread.tid = Random2(); //Inicia i id da thread
     getcontext(&new_thread.context);
 
-    new_thread.context.uc_link = &main_context; //Salva thread de retorno (uc_link)
+    new_thread.context.uc_link = &dispatcher_context; //Salva thread de retorno (uc_link)
     new_thread.context.uc_stack.ss_sp = new_thread.stack; //Stack da thread
     new_thread.context.uc_stack.ss_size = sizeof(new_thread.stack);
     new_thread.prio = prio; //Salva prioridade na estrutura
 
     makecontext(&new_thread.context, (void (*)(void)) start, 1);
 
-    getcontext(&main_context);
-    if (!control) {
-        control = 1;
-        printf("Antes do set context");
-        setcontext(&new_thread.context);
+    //TESTE --------------
+    struct s_TCB teste_thread;
+
+    teste_thread.tid = Random2(); //Inicia i id da thread
+    getcontext(&teste_thread.context);
+
+    teste_thread.context.uc_link = &dispatcher_context; //Salva thread de retorno (uc_link)
+    teste_thread.context.uc_stack.ss_sp = teste_thread.stack; //Stack da thread
+    teste_thread.context.uc_stack.ss_size = sizeof(teste_thread.stack);
+    teste_thread.prio = prio; //Salva prioridade na estrutura
+
+    makecontext(&teste_thread.context, (void (*)(void)) teste, 1);
+    //------------
+
+    switch (prio) {
+        case PRIORITY_HIGH:
+            AppendFila2(&fifoHigh, &new_thread);
+            AppendFila2(&fifoHigh, &teste_thread);
+            break;
+        case PRIORITY_MEDIUM:
+            AppendFila2(&fifoMedium, &new_thread);
+            break;
+        case PRIORITY_LOW:
+            AppendFila2(&fifoLow, &new_thread);
+            break;
     }
-    printf("Depois do set context");
 
-    status = status - addThreadToFifo(&new_thread);
 
-    //dispatcher();
+    int saveMain = -1;
+    saveMainThread();
+
+    if (saveMain == -1) {
+        saveMain = 0;
+        dispatcher();
+    }
 
     return status;
 }
@@ -91,4 +125,3 @@ int cidentify(char *name, int size) {
         return FUNCTION_SUCCESS;
     }
 }
-

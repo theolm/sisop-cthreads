@@ -10,6 +10,12 @@
 #include <ucontext.h>
 #include "fifo_manager.h"
 
+ucontext_t dispatcher_context;
+char dispatcher_stack[SIGSTKSZ];
+
 int dispatcher();
+int initDispatcher();
+
+
 
 #endif //CTHREAD_ESCALONADOR_H
