@@ -12,6 +12,7 @@
 #include "../include/cdata.h"
 #include "../include/fifo_manager.h"
 #include "../include/escalonador.h"
+#include "../include/setup_lib.h"
 
 
 int dispatcher() {
@@ -26,23 +27,19 @@ int dispatcher() {
 
     if (high == 0) {
         printf("\nfifoHigh\n");
-        struct s_TCB thread = *(struct s_TCB *) GetAtIteratorFila2(&fifoHigh);
-        DeleteAtIteratorFila2(&fifoHigh);
+        struct s_TCB thread = getFromFifo(PRIORITY_HIGH);
         setcontext(&thread.context);
     }
     if (medium == 0) {
         printf("\nfifoMedium\n");
-        struct s_TCB thread = *(struct s_TCB *) GetAtIteratorFila2(&fifoMedium);
-        DeleteAtIteratorFila2(&fifoMedium);
+        struct s_TCB thread = getFromFifo(PRIORITY_MEDIUM);
         setcontext(&thread.context);
     }
     if (low == 0) {
         printf("\nfifoLow\n");
-        struct s_TCB thread = *(struct s_TCB *) GetAtIteratorFila2(&fifoLow);
-        DeleteAtIteratorFila2(&fifoLow);
+        struct s_TCB thread = getFromFifo(PRIORITY_LOW);
         setcontext(&thread.context);
     }
-
 
     printf("\nend dispatcher\n");
     return 0;

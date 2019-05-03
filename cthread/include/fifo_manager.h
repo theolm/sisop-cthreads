@@ -19,6 +19,7 @@ FILA2 fifoHigh;
  * @return
  */
 int initializeFifos();
-int addThreadToFifo(struct s_TCB* newThread);
+int addThreadToFifo(void *newThread, int prio);
+struct s_TCB getFromFifo(int prio);
 
 #endif //CTHREAD_FIFO_MANAGER_H

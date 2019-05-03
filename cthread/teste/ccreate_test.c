@@ -35,12 +35,9 @@ int main(int argc, char *argv[]) {
 
     ccreate(func2, (void *)&i, 1);
     printf("\nacabou 2 create!\n");
-//
-//    ccreate(func3, (void *)&i, 0);
-//    printf("\nacabou 3 create!\n");
 
-    //int id2 = ccreate(func1, (void *)&i, 0);
-    //int id3 = ccreate(func1, (void *)&i, 0);
+    ccreate(func3, (void *)&i, 0);
+    printf("\nacabou 3 create!\n");
 
     printf("\n-------------- FINAL DA MAIN -----------------\n");
     exit(0);

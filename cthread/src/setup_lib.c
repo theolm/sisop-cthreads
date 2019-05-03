@@ -56,13 +56,18 @@ int initMain() {
     return FUNCTION_SUCCESS;
 }
 
+int endMain() {
+    exit(0);
+}
+
 int saveMainThread() {
     struct s_TCB main_thread;
     main_thread.tid = 0;
-    getcontext(&main_thread.context);
+    main_thread.context.uc_link = &endMain;
     main_thread.context.uc_stack.ss_sp = main_thread.stack; //Stack da thread
     main_thread.context.uc_stack.ss_size = sizeof(main_thread.stack);
     main_thread.prio = PRIORITY_LOW;
+    getcontext(&main_thread.context);
     AppendFila2(&fifoLow, &main_thread);
     return FUNCTION_SUCCESS;
 }
@@ -71,7 +76,6 @@ int initDispatcher() {
     printf("\ninitDispatcher\n");
     getcontext(&dispatcher_context);
 
-//    dispatcher_context.uc_link          = &main_context; //TODO: Qual o uc_link do dispatcher?
     dispatcher_context.uc_stack.ss_sp = dispatcher_stack;
     dispatcher_context.uc_stack.ss_size = sizeof(dispatcher_stack);
     makecontext(&dispatcher_context, (void (*)(void)) dispatcher, 1);

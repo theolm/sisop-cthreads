@@ -18,6 +18,8 @@
 ***/
 int isInit = -1;
 
+ucontext_t test_thread;
+char test_stack[SIGSTKSZ];
 int teste() {
     int i;
     for (i =0; i <=5; i++ ) {
@@ -46,33 +48,7 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
 
     makecontext(&new_thread.context, (void (*)(void)) start, 1);
 
-    //TESTE --------------
-    struct s_TCB teste_thread;
-
-    teste_thread.tid = Random2(); //Inicia i id da thread
-    getcontext(&teste_thread.context);
-
-    teste_thread.context.uc_link = &dispatcher_context; //Salva thread de retorno (uc_link)
-    teste_thread.context.uc_stack.ss_sp = teste_thread.stack; //Stack da thread
-    teste_thread.context.uc_stack.ss_size = sizeof(teste_thread.stack);
-    teste_thread.prio = prio; //Salva prioridade na estrutura
-
-    makecontext(&teste_thread.context, (void (*)(void)) teste, 1);
-    //------------
-
-    switch (prio) {
-        case PRIORITY_HIGH:
-            AppendFila2(&fifoHigh, &new_thread);
-            AppendFila2(&fifoHigh, &teste_thread);
-            break;
-        case PRIORITY_MEDIUM:
-            AppendFila2(&fifoMedium, &new_thread);
-            break;
-        case PRIORITY_LOW:
-            AppendFila2(&fifoLow, &new_thread);
-            break;
-    }
-
+    addThreadToFifo(&new_thread, prio);
 
     int saveMain = -1;
     saveMainThread();
