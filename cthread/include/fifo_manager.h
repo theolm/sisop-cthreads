@@ -18,9 +18,8 @@ FILA2 fifoHigh;
  * Return 1 if fifos was already created
  * @return
  */
-int initFifosIfNeeded();
-int addThreadToFifo(struct s_TCB* newThread);
-int createMainThreadIfNeeded();
-
+int initializeFifos();
+int addThreadToFifo(void *newThread, int prio);
+struct s_TCB getFromFifo(int prio);
 
 #endif //CTHREAD_FIFO_MANAGER_H

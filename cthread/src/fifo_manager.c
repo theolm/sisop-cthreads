@@ -15,8 +15,6 @@ FILA2 fifoLow;
 FILA2 fifoMedium;
 FILA2 fifoHigh;
 
-int flagFilasCreated = -1; //Caso seja -1 as filas nao foram inizializadas.
-
 /*Retorna 0 se filas forem criadas com sucesso*/
 int initializeFifos() {
     int a = CreateFila2(&fifoLow);
@@ -25,38 +23,44 @@ int initializeFifos() {
     return a + b + c;
 }
 
-int initFifosIfNeeded() {
-    if (flagFilasCreated == -1) {
-        int status = initializeFifos();
-        if (status == 0) {
-            flagFilasCreated = 0;
-            printf("Filas criadas");
-            return FUNCTION_SUCCESS;
-        } else {
-            printf("Erro ao criar filas.");
-            return FUNCTION_ERROR;
-        }
-    } else {
-        return 1;
-    }
-}
-
-int addThreadToFifo(struct s_TCB *newThread) {
-    int prio = newThread->prio;
-
+int addThreadToFifo(void *newThread, int prio) {
     switch (prio) {
         case PRIORITY_HIGH:
-            return AppendFila2(&fifoHigh, &newThread);
+            return AppendFila2(&fifoHigh, newThread);
         case PRIORITY_MEDIUM:
-            return AppendFila2(&fifoMedium, &newThread);
+            return AppendFila2(&fifoMedium, newThread);
         case PRIORITY_LOW:
-            return AppendFila2(&fifoLow, &newThread);
+            return AppendFila2(&fifoLow, newThread);
         default:
             return FUNCTION_ERROR;
     }
 }
 
-int createMainThreadIfNeeded() {
-//TODO: salvar criar s_TCB da main thread caso necessario e adicionar na fila de baixa prioridade
-    return 0;
+/**
+ * Its mandatory check if the fifo is not empty before call this function.
+ * @param prio
+ * @return s_TCB
+ */
+struct s_TCB getFromFifo(int prio) {
+    struct s_TCB thread;
+
+    switch (prio) {
+        case PRIORITY_HIGH:
+            FirstFila2(&fifoHigh);
+            thread = *(struct s_TCB *) GetAtIteratorFila2(&fifoHigh);
+            DeleteAtIteratorFila2(&fifoHigh);
+            break;
+        case PRIORITY_MEDIUM:
+            FirstFila2(&fifoMedium);
+            thread = *(struct s_TCB *) GetAtIteratorFila2(&fifoMedium);
+            DeleteAtIteratorFila2(&fifoMedium);
+            break;
+        default:
+            FirstFila2(&fifoLow);
+            thread = *(struct s_TCB *) GetAtIteratorFila2(&fifoLow);
+            DeleteAtIteratorFila2(&fifoLow);
+            break;
+    }
+
+    return thread;
 }

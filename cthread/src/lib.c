@@ -3,23 +3,37 @@
 #include <string.h>
 #include <ucontext.h>
 #include <bits/sigstack.h>
+#include <stdlib.h>
 #include "../include/support.h"
 #include "../include/cthread.h"
 #include "../include/cdata.h"
 #include "../include/fifo_manager.h"
 #include "../include/defines.h"
+#include "../include/escalonador.h"
+#include "../include/setup_lib.h"
+
 
 /***
  * FUNCOES DA CTHREADS.H
 ***/
+int isInit = -1;
+
+ucontext_t test_thread;
+char test_stack[SIGSTKSZ];
+int teste() {
+    int i;
+    for (i =0; i <=5; i++ ) {
+        printf("TESTE\n");
+    }
+}
+
 int ccreate(void *(*start)(void *), void *arg, int prio) {
+    if (isInit == -1) {
+        isInit = 0;
+        initLibrary();
+    }
+
     int status = 0;
-
-    status = status - initFifosIfNeeded();
-    status = status - createMainThreadIfNeeded();
-
-    /*Contexto da mainThread usada para o uc_link -> para onde voltar quando acabar o processo??? escalonador?*/
-    ucontext_t main_context;
 
     /*Contexto e estrutura da thead nova*/
     struct s_TCB new_thread;
@@ -27,14 +41,22 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
     new_thread.tid = Random2(); //Inicia i id da thread
     getcontext(&new_thread.context);
 
-    new_thread.context.uc_link = &main_context; //Salva thread de retorno (uc_link)
+    new_thread.context.uc_link = &dispatcher_context; //Salva thread de retorno (uc_link)
     new_thread.context.uc_stack.ss_sp = new_thread.stack; //Stack da thread
     new_thread.context.uc_stack.ss_size = sizeof(new_thread.stack);
     new_thread.prio = prio; //Salva prioridade na estrutura
 
-    makecontext(&new_thread.context, (void (*)(void)) start, 0);
+    makecontext(&new_thread.context, (void (*)(void)) start, 1);
 
-    status = status - addThreadToFifo(&new_thread);
+    addThreadToFifo(&new_thread, prio);
+
+    int saveMain = -1;
+    saveMainThread();
+
+    if (saveMain == -1) {
+        saveMain = 0;
+        dispatcher();
+    }
 
     return status;
 }
@@ -79,4 +101,3 @@ int cidentify(char *name, int size) {
         return FUNCTION_SUCCESS;
     }
 }
-
