@@ -16,32 +16,32 @@
 
 
 int dispatcher() {
-    getcontext(&dispatcher_context);
-    printf("\nDispatcher run\n");
+    while (1) {
+        printf("\nDispatcher Loop ini\n");
 
-    int high = FirstFila2(&fifoHigh);
-    int medium = FirstFila2(&fifoMedium);
-    int low = FirstFila2(&fifoLow);
+        if (FirstFila2(&fifoHigh) == 0) {
+            printf("\nfifoHigh\n");
+            active_thread = getFromFifo(PRIORITY_HIGH);
+            printf("\nactive_thread high\n");
+        } else if (FirstFila2(&fifoMedium) == 0) {
+            printf("\nfifoMedium\n");
+            active_thread = getFromFifo(PRIORITY_MEDIUM);
+            printf("\nctive_thread medium\n");
+        } else if (FirstFila2(&fifoLow) == 0) {
+            printf("\nfifoLow\n");
+            active_thread = getFromFifo(PRIORITY_LOW);
+            printf("\nctive_thread low\n");
+        } else {
+            printf("\nTenta por main\n");
+            swapcontext(&dispatcher_context, &main_thread.context);
+            printf("\nafter swap main\n");
+        }
 
-    printf("\nhigh: %d medium: %d low: %d\n", high, medium, low);
-
-    if (high == 0) {
-        printf("\nfifoHigh\n");
-        struct s_TCB thread = getFromFifo(PRIORITY_HIGH);
-        setcontext(&thread.context);
+        printf("\nswap context -> active thread\n");
+        swapcontext(&dispatcher_context, &active_thread.context);
+        printf("\nafter swap\n");
+        printf("\nloop end dispatcher\n");
     }
-    if (medium == 0) {
-        printf("\nfifoMedium\n");
-        struct s_TCB thread = getFromFifo(PRIORITY_MEDIUM);
-        setcontext(&thread.context);
-    }
-    if (low == 0) {
-        printf("\nfifoLow\n");
-        struct s_TCB thread = getFromFifo(PRIORITY_LOW);
-        setcontext(&thread.context);
-    }
-
-    printf("\nend dispatcher\n");
     return 0;
 }
 

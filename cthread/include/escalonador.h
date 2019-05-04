@@ -12,6 +12,7 @@
 
 ucontext_t dispatcher_context;
 char dispatcher_stack[SIGSTKSZ];
+struct s_TCB active_thread;
 
 int dispatcher();
 int initDispatcher();

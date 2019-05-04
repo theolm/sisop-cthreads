@@ -23,12 +23,6 @@ int initLibrary() {
         initializeFifos();
     }
 
-    //Nao precisa
-//    if (flagMain == -1) {
-//        flagMain = 0;
-//        initMain();
-//    }
-
     if (flagDispatcher == -1) {
         flagDispatcher = 0;
         initDispatcher();
@@ -37,38 +31,13 @@ int initLibrary() {
     return FUNCTION_SUCCESS;
 }
 
-
-/*Acho que nao precisa de init main... sempre que a main for bloqueada ou ir pra fila de aptos tem que salvar o contexto dela antes de por na fila -> saveMainThread*/
-int initMain() {
-//    printf("\ninitMain\n");
-//
-//    struct s_TCB main_thread;
-//    main_thread.tid = 0;
-//    getcontext(&main_thread.context);
-//
-//    main_thread.context.uc_stack.ss_sp = main_thread.stack; //Stack da thread
-//    main_thread.context.uc_stack.ss_size = sizeof(main_thread.stack);
-//    main_thread.prio = PRIORITY_LOW;
-//
-//    AppendFila2(&fifoLow, &main_thread);
-//    printf("\nAdicionou mainThread na fila de baixa prioridade!\n");
-
-    return FUNCTION_SUCCESS;
-}
-
-int endMain() {
-    exit(0);
-}
-
 int saveMainThread() {
-    struct s_TCB main_thread;
     main_thread.tid = 0;
-    main_thread.context.uc_link = &endMain;
     main_thread.context.uc_stack.ss_sp = main_thread.stack; //Stack da thread
     main_thread.context.uc_stack.ss_size = sizeof(main_thread.stack);
     main_thread.prio = PRIORITY_LOW;
     getcontext(&main_thread.context);
-    AppendFila2(&fifoLow, &main_thread);
+    //AppendFila2(&fifoLow, &main_thread); //TODO: fix main thread seg fault
     return FUNCTION_SUCCESS;
 }
 

@@ -20,6 +20,7 @@ int initializeFifos() {
     int a = CreateFila2(&fifoLow);
     int b = CreateFila2(&fifoMedium);
     int c = CreateFila2(&fifoHigh);
+    printf("Filas criadas %d", (a+b+c));
     return a + b + c;
 }
 
@@ -46,17 +47,17 @@ struct s_TCB getFromFifo(int prio) {
 
     switch (prio) {
         case PRIORITY_HIGH:
-            FirstFila2(&fifoHigh);
+            //FirstFila2(&fifoHigh);
             thread = *(struct s_TCB *) GetAtIteratorFila2(&fifoHigh);
             DeleteAtIteratorFila2(&fifoHigh);
             break;
         case PRIORITY_MEDIUM:
-            FirstFila2(&fifoMedium);
+            //FirstFila2(&fifoMedium);
             thread = *(struct s_TCB *) GetAtIteratorFila2(&fifoMedium);
             DeleteAtIteratorFila2(&fifoMedium);
             break;
         default:
-            FirstFila2(&fifoLow);
+            //FirstFila2(&fifoLow);
             thread = *(struct s_TCB *) GetAtIteratorFila2(&fifoLow);
             DeleteAtIteratorFila2(&fifoLow);
             break;
