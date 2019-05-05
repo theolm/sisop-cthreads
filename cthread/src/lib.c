@@ -54,6 +54,12 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
  * como NULL
  **/
 int csetprio(int tid, int prio) {
+    if(active_thread.tid == 0) {
+        /*Main thread nao pode alterar sua prioridade*/
+        printf("\n**********\nMain thread cant change ");
+        return FUNCTION_ERROR;
+    }
+
     return FUNCTION_NOT_IMPLEMENTED;
 }
 
