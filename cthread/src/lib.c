@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <ucontext.h>
-#include <bits/sigstack.h>
 #include <stdlib.h>
 #include "../include/support.h"
 #include "../include/cthread.h"
@@ -18,15 +17,7 @@
 ***/
 int isInit = -1;
 
-ucontext_t test_thread;
-char test_stack[SIGSTKSZ];
-int teste() {
-    int i;
-    for (i =0; i <=5; i++ ) {
-        printf("TESTE\n");
-    }
-}
-
+int saveMain = -1;
 int ccreate(void *(*start)(void *), void *arg, int prio) {
     if (isInit == -1) {
         isInit = 0;
@@ -36,27 +27,24 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
     int status = 0;
 
     /*Contexto e estrutura da thead nova*/
-    struct s_TCB new_thread;
+    struct s_TCB *new_thread = (struct s_TCB *)malloc(sizeof(struct s_TCB));
 
-    new_thread.tid = Random2(); //Inicia i id da thread
-    getcontext(&new_thread.context);
+    new_thread->tid = Random2(); //Inicia i id da thread
+    getcontext(&new_thread->context);
 
-    new_thread.context.uc_link = &dispatcher_context; //Salva thread de retorno (uc_link)
-    new_thread.context.uc_stack.ss_sp = new_thread.stack; //Stack da thread
-    new_thread.context.uc_stack.ss_size = sizeof(new_thread.stack);
-    new_thread.prio = prio; //Salva prioridade na estrutura
+    new_thread->context.uc_link = &escalonador_context; //Salva thread de retorno (uc_link)
+    new_thread->context.uc_stack.ss_sp = new_thread->stack; //Stack da thread
+    new_thread->context.uc_stack.ss_size = sizeof(new_thread->stack);
+    new_thread->prio = prio; //Salva prioridade na estrutura
 
-    makecontext(&new_thread.context, (void (*)(void)) start, 1);
 
-    addThreadToFifo(&new_thread, prio);
+    makecontext(&new_thread->context, (void (*)(void)) start, 1);
 
-    int saveMain = -1;
+    addThreadToFifo(new_thread, prio);
+
     saveMainThread();
-
-    if (saveMain == -1) {
-        saveMain = 0;
-        dispatcher();
-    }
+    swapcontext(&main_thread.context, &escalonador_context);
+    printf("Continuou main");
 
     return status;
 }
@@ -71,7 +59,24 @@ int csetprio(int tid, int prio) {
 
 
 int cyield(void) {
-    return FUNCTION_NOT_IMPLEMENTED;
+
+    int control = -1;
+
+    struct s_TCB *thread = (struct s_TCB *)malloc(sizeof(struct s_TCB));
+    thread->prio = active_thread.prio;
+    thread->tid = active_thread.tid;
+    thread->context.uc_stack.ss_sp = thread->stack;
+    thread->context.uc_stack.ss_size = sizeof(thread->stack);
+
+    getcontext(&thread->context);
+
+    if(control == -1) {
+        control = 0;
+        addThreadToFifo(thread, thread->prio);
+        setcontext(&escalonador_context);
+    }
+
+    return FUNCTION_SUCCESS;
 }
 
 int cjoin(int tid) {

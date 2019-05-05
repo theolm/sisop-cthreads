@@ -8,36 +8,33 @@
 #include <stdlib.h>
 
 void* func1(void *arg) {
-    int i;
-    for (i =0; i <=5; i++ ) {
-        printf("%1\n",i);
+    int i = 0;
+    for (i =1; i <=100; i++ ) {
+        printf("A\n");
+
+        if(i%2 == 0) {
+            cyield();
+        }
     }
 }
 
 void* func2(void *arg) {
-    int i;
-    for (i =0; i <=5; i++ ) {
-        printf("2\n");
-    }
-}
-
-void* func3(void *arg) {
-    int i;
-    for (i =0; i <=5; i++ ) {
-        printf("3\n");
+    int i = 0;
+    for (i =1; i <=100; i++ ) {
+        printf("B\n");
+        if(i%2 == 0) {
+            cyield();
+        }
     }
 }
 
 int main(int argc, char *argv[]) {
-    int i;
-    ccreate(func1, (void *)&i, 0);
-    printf("\nacabou 1 create!\n");
-
-    ccreate(func2, (void *)&i, 1);
-    printf("\nacabou 2 create!\n");
-
-    ccreate(func3, (void *)&i, 0);
-    printf("\nacabou 3 create!\n");
+    int a,b;
+    ccreate(func1, (void *)&a, 2);
+    ccreate(func2, (void *)&a, 2);
+    cyield();
+    cyield();
+    cyield();
 
     printf("\n-------------- FINAL DA MAIN -----------------\n");
     exit(0);

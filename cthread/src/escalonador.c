@@ -6,7 +6,6 @@
 #include <string.h>
 #include <ucontext.h>
 #include <stdlib.h>
-#include <bits/sigstack.h>
 #include "../include/defines.h"
 #include "../include/support.h"
 #include "../include/cdata.h"
@@ -15,34 +14,45 @@
 #include "../include/setup_lib.h"
 
 
+int escalonador() {
+    while (1) {
+        dispatcher();
+    }
+    return FUNCTION_SUCCESS;
+}
+
 int dispatcher() {
-    getcontext(&dispatcher_context);
-    printf("\nDispatcher run\n");
 
-    int high = FirstFila2(&fifoHigh);
-    int medium = FirstFila2(&fifoMedium);
-    int low = FirstFila2(&fifoLow);
-
-    printf("\nhigh: %d medium: %d low: %d\n", high, medium, low);
-
-    if (high == 0) {
+    if (FirstFila2(&fifoHigh) == 0) {
         printf("\nfifoHigh\n");
-        struct s_TCB thread = getFromFifo(PRIORITY_HIGH);
-        setcontext(&thread.context);
-    }
-    if (medium == 0) {
+        active_thread = *(struct s_TCB *) GetAtIteratorFila2(&fifoHigh);
+        FirstFila2(&fifoHigh);
+        DeleteAtIteratorFila2(&fifoHigh);
+        printf("\nswap context -> active thread\n");
+        swapcontext(&escalonador_context, &active_thread.context);
+        printf("\nafter swap lol\n");
+        printf("\nactive_thread high\n");
+    } else if (FirstFila2(&fifoMedium) == 0) {
         printf("\nfifoMedium\n");
-        struct s_TCB thread = getFromFifo(PRIORITY_MEDIUM);
-        setcontext(&thread.context);
-    }
-    if (low == 0) {
+        active_thread = *(struct s_TCB *) GetAtIteratorFila2(&fifoMedium);
+        FirstFila2(&fifoMedium);
+        DeleteAtIteratorFila2(&fifoMedium);
+        printf("\nswap context -> active thread\n");
+        swapcontext(&escalonador_context, &active_thread.context);
+        printf("\nafter swap\n");
+        printf("\nctive_thread medium\n");
+    } else if (FirstFila2(&fifoLow) == 0) {
         printf("\nfifoLow\n");
-        struct s_TCB thread = getFromFifo(PRIORITY_LOW);
-        setcontext(&thread.context);
+        active_thread = *(struct s_TCB *) GetAtIteratorFila2(&fifoLow);
+        FirstFila2(&fifoLow);
+        DeleteAtIteratorFila2(&fifoLow);
+        printf("\nswap context -> active thread\n");
+        swapcontext(&escalonador_context, &active_thread.context);
+        printf("\nafter swap\n");
+        printf("\nctive_thread low\n");
     }
 
-    printf("\nend dispatcher\n");
-    return 0;
+    return FUNCTION_SUCCESS;
 }
 
 

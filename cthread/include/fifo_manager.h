@@ -11,6 +11,7 @@
 FILA2 fifoLow;
 FILA2 fifoMedium;
 FILA2 fifoHigh;
+FILA2 fifoBlock;
 
 /**
  * Return -1 if error
@@ -20,6 +21,7 @@ FILA2 fifoHigh;
  */
 int initializeFifos();
 int addThreadToFifo(void *newThread, int prio);
+void printFifosStatus();
 struct s_TCB getFromFifo(int prio);
 
 #endif //CTHREAD_FIFO_MANAGER_H
