@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <ucontext.h>
-#include <bits/sigstack.h>
 #include <stdlib.h>
 #include "../include/support.h"
 #include "../include/cthread.h"
@@ -28,19 +27,20 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
     int status = 0;
 
     /*Contexto e estrutura da thead nova*/
-    struct s_TCB new_thread;
+    struct s_TCB *new_thread = (struct s_TCB *)malloc(sizeof(struct s_TCB));
 
-    new_thread.tid = Random2(); //Inicia i id da thread
-    getcontext(&new_thread.context);
+    new_thread->tid = Random2(); //Inicia i id da thread
+    getcontext(&new_thread->context);
 
-    new_thread.context.uc_link = &escalonador_context; //Salva thread de retorno (uc_link)
-    new_thread.context.uc_stack.ss_sp = new_thread.stack; //Stack da thread
-    new_thread.context.uc_stack.ss_size = sizeof(new_thread.stack);
-    new_thread.prio = prio; //Salva prioridade na estrutura
+    new_thread->context.uc_link = &escalonador_context; //Salva thread de retorno (uc_link)
+    new_thread->context.uc_stack.ss_sp = new_thread->stack; //Stack da thread
+    new_thread->context.uc_stack.ss_size = sizeof(new_thread->stack);
+    new_thread->prio = prio; //Salva prioridade na estrutura
 
-    makecontext(&new_thread.context, (void (*)(void)) start, 1);
 
-    addThreadToFifo(&new_thread, prio);
+    makecontext(&new_thread->context, (void (*)(void)) start, 1);
+
+    addThreadToFifo(new_thread, prio);
 
     saveMainThread();
     swapcontext(&main_thread.context, &escalonador_context);
@@ -59,13 +59,21 @@ int csetprio(int tid, int prio) {
 
 
 int cyield(void) {
+
     int control = -1;
 
-    getcontext(&active_thread.context);
+    struct s_TCB *thread = (struct s_TCB *)malloc(sizeof(struct s_TCB));
+    thread->prio = active_thread.prio;
+    thread->tid = active_thread.tid;
+    thread->context.uc_stack.ss_sp = thread->stack;
+    thread->context.uc_stack.ss_size = sizeof(thread->stack);
+
+    getcontext(&thread->context);
+
     if(control == -1) {
         control = 0;
-        addThreadToFifo(&active_thread, active_thread.prio);
-        dispatcher();
+        addThreadToFifo(thread, thread->prio);
+        setcontext(&escalonador_context);
     }
 
     return FUNCTION_SUCCESS;

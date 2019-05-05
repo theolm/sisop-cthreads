@@ -9,20 +9,32 @@
 
 void* func1(void *arg) {
     int i = 0;
-    for (i =0; i <=6; i++ ) {
+    for (i =1; i <=100; i++ ) {
+        printf("A\n");
+
         if(i%2 == 0) {
-            printf("%d\n",i);
-            //cyield();
+            cyield();
+        }
+    }
+}
+
+void* func2(void *arg) {
+    int i = 0;
+    for (i =1; i <=100; i++ ) {
+        printf("B\n");
+        if(i%2 == 0) {
+            cyield();
         }
     }
 }
 
 int main(int argc, char *argv[]) {
-    int a;
+    int a,b;
     ccreate(func1, (void *)&a, 2);
-    ccreate(func1, (void *)&a, 2);
-    ccreate(func1, (void *)&a, 2);
-    ccreate(func1, (void *)&a, 2);
+    ccreate(func2, (void *)&a, 2);
+    cyield();
+    cyield();
+    cyield();
 
     printf("\n-------------- FINAL DA MAIN -----------------\n");
     exit(0);

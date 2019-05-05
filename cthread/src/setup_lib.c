@@ -6,7 +6,6 @@
 #include <string.h>
 #include <ucontext.h>
 #include <stdlib.h>
-#include <bits/sigstack.h>
 #include "../include/defines.h"
 #include "../include/support.h"
 #include "../include/cdata.h"
@@ -36,7 +35,7 @@ int saveMainThread() {
     main_thread.context.uc_stack.ss_sp = main_thread.stack; //Stack da thread
     main_thread.context.uc_stack.ss_size = sizeof(main_thread.stack);
     main_thread.prio = PRIORITY_LOW;
-    AppendFila2(&fifoLow, &main_thread); //TODO: fix main thread seg fault
+    AppendFila2(&fifoLow, &main_thread);
     return FUNCTION_SUCCESS;
 }
 

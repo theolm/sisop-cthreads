@@ -6,7 +6,6 @@
 #include <string.h>
 #include <ucontext.h>
 #include <stdlib.h>
-#include <bits/sigstack.h>
 #include "../include/defines.h"
 #include "../include/support.h"
 #include "../include/cdata.h"

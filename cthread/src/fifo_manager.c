@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <ucontext.h>
-#include <bits/sigstack.h>
 #include "../include/defines.h"
 #include "../include/support.h"
 #include "../include/cdata.h"
@@ -24,13 +23,10 @@ int initializeFifos() {
 int addThreadToFifo(void *newThread, int prio) {
     switch (prio) {
         case PRIORITY_HIGH:
-            printf("Add to High");
             return AppendFila2(&fifoHigh, newThread);
         case PRIORITY_MEDIUM:
-            printf("Add to Medium");
             return AppendFila2(&fifoMedium, newThread);
         case PRIORITY_LOW:
-            printf("Add to Low");
             return AppendFila2(&fifoLow, newThread);
         default:
             return FUNCTION_ERROR;
