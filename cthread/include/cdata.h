@@ -28,7 +28,7 @@ typedef struct s_TCB {
 	/* A PARTIR DESSE PONTO PODEM SER ACRESCENTADOS CAMPOS NECESS�RIOS AO DESENVOLVIMENTO DA BIBLIOTECA
 	*/
 
-    char stack[SIGSTKSZ];
+    char stack[STACK_SIZE];
 	
 } TCB_t; 
 
