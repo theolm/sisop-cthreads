@@ -11,26 +11,26 @@
 #include "../include/cdata.h"
 #include "../include/fifo_manager.h"
 
-FILA2 fifoLow;
-FILA2 fifoMedium;
-FILA2 fifoHigh;
-
 /*Retorna 0 se filas forem criadas com sucesso*/
 int initializeFifos() {
     int a = CreateFila2(&fifoLow);
     int b = CreateFila2(&fifoMedium);
     int c = CreateFila2(&fifoHigh);
-    printf("Filas criadas %d", (a+b+c));
-    return a + b + c;
+    int d = CreateFila2(&fifoBlock);
+    printf("Filas criadas %d", (a+b+c+d));
+    return a + b + c + d;
 }
 
 int addThreadToFifo(void *newThread, int prio) {
     switch (prio) {
         case PRIORITY_HIGH:
+            printf("Add to High");
             return AppendFila2(&fifoHigh, newThread);
         case PRIORITY_MEDIUM:
+            printf("Add to Medium");
             return AppendFila2(&fifoMedium, newThread);
         case PRIORITY_LOW:
+            printf("Add to Low");
             return AppendFila2(&fifoLow, newThread);
         default:
             return FUNCTION_ERROR;
@@ -64,4 +64,8 @@ struct s_TCB getFromFifo(int prio) {
     }
 
     return thread;
+}
+
+void printFifosStatus() {
+    printf("\nFifos status High: %d Medium: %d Low: %d\n", FirstFila2(&fifoHigh), FirstFila2(&fifoMedium), FirstFila2(&fifoLow));
 }

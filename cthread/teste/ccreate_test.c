@@ -9,7 +9,7 @@
 
 void* func1(void *arg) {
     int i = 0;
-    for (i =0; i <=6; i++ ) {
+    for (i =0; i <=100000; i++ ) {
         if(i%2 == 0) {
             printf("%d\n",i);
             //cyield();

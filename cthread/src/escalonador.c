@@ -15,34 +15,55 @@
 #include "../include/setup_lib.h"
 
 
-int dispatcher() {
+int escalonador() {
     while (1) {
-        printf("\nDispatcher Loop ini\n");
+        printf("Escalonador loop\n");
+        printFifosStatus();
+        dispatcher();
+    }
+    return FUNCTION_SUCCESS;
+}
 
-        if (FirstFila2(&fifoHigh) == 0) {
-            printf("\nfifoHigh\n");
-            active_thread = getFromFifo(PRIORITY_HIGH);
-            printf("\nactive_thread high\n");
-        } else if (FirstFila2(&fifoMedium) == 0) {
-            printf("\nfifoMedium\n");
-            active_thread = getFromFifo(PRIORITY_MEDIUM);
-            printf("\nctive_thread medium\n");
-        } else if (FirstFila2(&fifoLow) == 0) {
-            printf("\nfifoLow\n");
-            active_thread = getFromFifo(PRIORITY_LOW);
-            printf("\nctive_thread low\n");
-        } else {
-            printf("\nTenta por main\n");
-            swapcontext(&dispatcher_context, &main_thread.context);
-            printf("\nafter swap main\n");
-        }
+int dispatcher() {
+    printf("\nDispatcher run\n");
+    printFifosStatus();
+
+    if (FirstFila2(&fifoHigh) == 0) {
+        printf("\nfifoHigh\n");
+        active_thread = getFromFifo(PRIORITY_HIGH);
 
         printf("\nswap context -> active thread\n");
-        swapcontext(&dispatcher_context, &active_thread.context);
+        swapcontext(&escalonador_context, &active_thread.context);
         printf("\nafter swap\n");
-        printf("\nloop end dispatcher\n");
+
+        printf("\nactive_thread high\n");
+    } else if (FirstFila2(&fifoMedium) == 0) {
+        printf("\nfifoMedium\n");
+        active_thread = getFromFifo(PRIORITY_MEDIUM);
+
+        printf("\nswap context -> active thread\n");
+        swapcontext(&escalonador_context, &active_thread.context);
+        printf("\nafter swap\n");
+
+        printf("\nctive_thread medium\n");
+    } else if (FirstFila2(&fifoLow) == 0) {
+        printf("\nfifoLow\n");
+        active_thread = getFromFifo(PRIORITY_LOW);
+
+        printf("\nswap context -> active thread\n");
+        swapcontext(&escalonador_context, &active_thread.context);
+        printf("\nafter swap\n");
+
+        printf("\nctive_thread low\n");
+    } else {
+        printf("\nTenta por main\n");
+        swapcontext(&escalonador_context, &main_thread.context);
+        printf("\nafter swap main\n");
     }
-    return 0;
+
+    printFifosStatus();
+
+    return FUNCTION_SUCCESS;
 }
 
 

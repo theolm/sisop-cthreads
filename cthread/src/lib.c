@@ -27,38 +27,38 @@ int teste() {
     }
 }
 
-int addTestThreads() {
-    int prio = PRIORITY_LOW;
-
-    struct s_TCB test1;
-    getcontext(&test1.context);
-    test1.context.uc_link = &dispatcher_context; //Salva thread de retorno (uc_link)
-    test1.context.uc_stack.ss_sp = test1.stack; //Stack da thread
-    test1.context.uc_stack.ss_size = sizeof(test1.stack);
-    test1.prio = prio; //Salva prioridade na estrutura
-    makecontext(&test1.context, (void (*)(void)) teste, 1);
-
-//    struct s_TCB test2;
-//    test2.context.uc_link = &dispatcher_context; //Salva thread de retorno (uc_link)
-//    test2.context.uc_stack.ss_sp = test1.stack; //Stack da thread
-//    test2.context.uc_stack.ss_size = sizeof(test1.stack);
-//    test2.prio = prio; //Salva prioridade na estrutura
-//    makecontext(&test2.context, (void (*)(void)) teste, 1);
+//int addTestThreads() {
+//    int prio = PRIORITY_LOW;
 //
-//    struct s_TCB test3;
-//    test3.context.uc_link = &dispatcher_context; //Salva thread de retorno (uc_link)
-//    test3.context.uc_stack.ss_sp = test1.stack; //Stack da thread
-//    test3.context.uc_stack.ss_size = sizeof(test1.stack);
-//    test3.prio = prio; //Salva prioridade na estrutura
-//    makecontext(&test3.context, (void (*)(void)) teste, 1);
-
-
-    addThreadToFifo(&test1, prio);
-    //addThreadToFifo(&test2, prio);
-    //addThreadToFifo(&test3, prio);
-
-    return FUNCTION_SUCCESS;
-}
+//    struct s_TCB test1;
+//    getcontext(&test1.context);
+//    test1.context.uc_link = &dispatcher_context; //Salva thread de retorno (uc_link)
+//    test1.context.uc_stack.ss_sp = test1.stack; //Stack da thread
+//    test1.context.uc_stack.ss_size = sizeof(test1.stack);
+//    test1.prio = prio; //Salva prioridade na estrutura
+//    makecontext(&test1.context, (void (*)(void)) teste, 1);
+//
+////    struct s_TCB test2;
+////    test2.context.uc_link = &dispatcher_context; //Salva thread de retorno (uc_link)
+////    test2.context.uc_stack.ss_sp = test1.stack; //Stack da thread
+////    test2.context.uc_stack.ss_size = sizeof(test1.stack);
+////    test2.prio = prio; //Salva prioridade na estrutura
+////    makecontext(&test2.context, (void (*)(void)) teste, 1);
+////
+////    struct s_TCB test3;
+////    test3.context.uc_link = &dispatcher_context; //Salva thread de retorno (uc_link)
+////    test3.context.uc_stack.ss_sp = test1.stack; //Stack da thread
+////    test3.context.uc_stack.ss_size = sizeof(test1.stack);
+////    test3.prio = prio; //Salva prioridade na estrutura
+////    makecontext(&test3.context, (void (*)(void)) teste, 1);
+//
+//
+//    //addThreadToFifo(&test1, prio);
+//    //addThreadToFifo(&test2, prio);
+//    //addThreadToFifo(&test3, prio);
+//
+//    return FUNCTION_SUCCESS;
+//}
 
 int saveMain = -1;
 int ccreate(void *(*start)(void *), void *arg, int prio) {
@@ -75,7 +75,7 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
     new_thread.tid = Random2(); //Inicia i id da thread
     getcontext(&new_thread.context);
 
-    new_thread.context.uc_link = &dispatcher_context; //Salva thread de retorno (uc_link)
+    new_thread.context.uc_link = &escalonador_context; //Salva thread de retorno (uc_link)
     new_thread.context.uc_stack.ss_sp = new_thread.stack; //Stack da thread
     new_thread.context.uc_stack.ss_size = sizeof(new_thread.stack);
     new_thread.prio = prio; //Salva prioridade na estrutura
@@ -84,21 +84,9 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
 
     addThreadToFifo(&new_thread, prio);
 
-    //---teste -----------------
-    addTestThreads();
-    //---------------------------
-
-
     saveMainThread();
-    //getcontext(&main_context);
-    swapcontext(&main_thread.context, &dispatcher_context);
+    swapcontext(&main_thread.context, &escalonador_context);
     printf("Continuou main");
-
-
-//    if (saveMain == -1) {
-//        saveMain = 0;
-//        setcontext(&dispatcher_context);
-//    }
 
     return status;
 }

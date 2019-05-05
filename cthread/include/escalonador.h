@@ -10,12 +10,14 @@
 #include <ucontext.h>
 #include "fifo_manager.h"
 
-ucontext_t dispatcher_context;
-char dispatcher_stack[SIGSTKSZ];
+ucontext_t escalonador_context;
+char escalonador_stack[SIGSTKSZ];
 struct s_TCB active_thread;
+ucontext_t active_context;
 
+
+int escalonador();
 int dispatcher();
-int initDispatcher();
 
 
 
