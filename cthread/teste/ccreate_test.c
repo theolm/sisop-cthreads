@@ -9,10 +9,11 @@
 
 void* func1(void *arg) {
     int i = 0;
-    for (i =1; i <=100; i++ ) {
+    for (i =1; i <=30; i++ ) {
         printf("A\n");
 
-        if(i%2 == 0) {
+        if(i%10 == 0) {
+            csetprio(NULL, 1);
             cyield();
         }
     }
@@ -30,11 +31,7 @@ void* func2(void *arg) {
 
 int main(int argc, char *argv[]) {
     int a,b;
-    ccreate(func1, (void *)&a, 2);
-    ccreate(func2, (void *)&a, 2);
-    cyield();
-    cyield();
-    cyield();
+    ccreate(func1, (void *)&a, 0);
 
     printf("\n-------------- FINAL DA MAIN -----------------\n");
     exit(0);
