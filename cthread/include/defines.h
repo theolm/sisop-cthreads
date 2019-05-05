@@ -12,6 +12,6 @@
 #define PRIORITY_MEDIUM 1
 #define PRIORITY_LOW 2
 #define TID_MAIN_THREAD 0 /*A main thread tem prioridade baixa*/
-#define SIGSTKSZ 40960
+#define STACK_SIZE 40960
 
 #endif //CTHREAD_DEFINES_H
