@@ -32,25 +32,13 @@ int initLibrary() {
 }
 
 int saveMainThread() {
-//    main_thread.tid = 0;
-//    main_thread.context.uc_stack.ss_sp = main_thread.stack; //Stack da thread
-//    main_thread.context.uc_stack.ss_size = sizeof(main_thread.stack);
-//    main_thread.prio = PRIORITY_LOW;
-//    getcontext(&main_thread.context);
-//    //AppendFila2(&fifoLow, &main_thread); //TODO: fix main thread seg fault
+    main_thread.tid = 0;
+    main_thread.context.uc_stack.ss_sp = main_thread.stack; //Stack da thread
+    main_thread.context.uc_stack.ss_size = sizeof(main_thread.stack);
+    main_thread.prio = PRIORITY_LOW;
+    AppendFila2(&fifoLow, &main_thread); //TODO: fix main thread seg fault
     return FUNCTION_SUCCESS;
 }
-
-//int initDispatcher() {
-//    printf("\ninitDispatcher\n");
-//    getcontext(&dispatcher_context);
-//
-//    dispatcher_context.uc_stack.ss_sp = dispatcher_stack;
-//    dispatcher_context.uc_stack.ss_size = sizeof(dispatcher_stack);
-//    makecontext(&dispatcher_context, (void (*)(void)) dispatcher, 1);
-//
-//    return FUNCTION_SUCCESS;
-//}
 
 int initEscalonador() {
     printf("\ninit Escalonador\n");

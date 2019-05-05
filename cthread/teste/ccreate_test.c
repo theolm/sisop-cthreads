@@ -9,7 +9,7 @@
 
 void* func1(void *arg) {
     int i = 0;
-    for (i =0; i <=100000; i++ ) {
+    for (i =0; i <=6; i++ ) {
         if(i%2 == 0) {
             printf("%d\n",i);
             //cyield();
@@ -19,8 +19,10 @@ void* func1(void *arg) {
 
 int main(int argc, char *argv[]) {
     int a;
-    ccreate(func1, (void *)&a, 0);
-    printf("\nacabou 1 create!\n");
+    ccreate(func1, (void *)&a, 2);
+    ccreate(func1, (void *)&a, 2);
+    ccreate(func1, (void *)&a, 2);
+    ccreate(func1, (void *)&a, 2);
 
     printf("\n-------------- FINAL DA MAIN -----------------\n");
     exit(0);
