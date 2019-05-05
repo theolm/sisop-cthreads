@@ -35,7 +35,7 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
     new_thread->context.uc_stack.ss_sp = new_thread->stack; //Stack da thread
     new_thread->context.uc_stack.ss_size = sizeof(new_thread->stack);
     new_thread->prio = prio; //Salva prioridade na estrutura
-
+    new_thread->cjoin_tid = -1;
 
     makecontext(&new_thread->context, (void (*)(void)) start, 1);
 
@@ -63,11 +63,11 @@ int csetprio(int tid, int prio) {
     return FUNCTION_SUCCESS;
 }
 
-
 int cyield(void) {
     struct s_TCB *thread = (struct s_TCB *)malloc(sizeof(struct s_TCB));
     thread->prio = active_thread.prio;
     thread->tid = active_thread.tid;
+    thread->cjoin_tid = -1;
     thread->context.uc_stack.ss_sp = thread->stack;
     thread->context.uc_stack.ss_size = sizeof(thread->stack);
 

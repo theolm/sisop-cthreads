@@ -16,7 +16,6 @@ int initializeFifos() {
     int b = CreateFila2(&fifoMedium);
     int c = CreateFila2(&fifoHigh);
     int d = CreateFila2(&fifoBlock);
-    printf("Filas criadas %d", (a+b+c+d));
     return a + b + c + d;
 }
 
@@ -78,7 +77,7 @@ struct s_TCB getFromFifo(int prio) {
 }
 
 void printFifosStatus() {
-    printf("\nFifos status High: %d Medium: %d Low: %d\n", FirstFila2(&fifoHigh), FirstFila2(&fifoMedium), FirstFila2(&fifoLow));
+    printf("\nFifos status High: %d Medium: %d Low: %d Block: %d\n", FirstFila2(&fifoHigh), FirstFila2(&fifoMedium), FirstFila2(&fifoLow), FirstFila2(&fifoBlock));
 }
 
 /**

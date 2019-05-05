@@ -32,6 +32,7 @@ int initLibrary() {
 
 int saveMainThread() {
     main_thread.tid = 0;
+    main_thread.cjoin_tid = -1;
     main_thread.context.uc_stack.ss_sp = main_thread.stack; //Stack da thread
     main_thread.context.uc_stack.ss_size = sizeof(main_thread.stack);
     main_thread.prio = PRIORITY_LOW;

@@ -17,5 +17,6 @@ ucontext_t active_context;
 
 int escalonador();
 int dispatcher();
+int unblockCjoin();
 
 #endif //CTHREAD_ESCALONADOR_H
