@@ -16,7 +16,6 @@ int initializeFifos() {
     int b = CreateFila2(&fifoMedium);
     int c = CreateFila2(&fifoHigh);
     int d = CreateFila2(&fifoBlock);
-    printf("Filas criadas %d", (a+b+c+d));
     return a + b + c + d;
 }
 
@@ -31,6 +30,10 @@ int addThreadToFifo(void *newThread, int prio) {
         default:
             return FUNCTION_ERROR;
     }
+}
+
+int addToBlockFifo(void *newThread) {
+    return AppendFila2(&fifoBlock, newThread);
 }
 
 /**
@@ -74,5 +77,33 @@ struct s_TCB getFromFifo(int prio) {
 }
 
 void printFifosStatus() {
-    printf("\nFifos status High: %d Medium: %d Low: %d\n", FirstFila2(&fifoHigh), FirstFila2(&fifoMedium), FirstFila2(&fifoLow));
+    printf("\nFifos status High: %d Medium: %d Low: %d Block: %d\n", FirstFila2(&fifoHigh), FirstFila2(&fifoMedium), FirstFila2(&fifoLow), FirstFila2(&fifoBlock));
+}
+
+/**
+ *
+ * @param pFila : fifo to look for the tid.
+ * @param tid : id of the thread.
+ * @return 0 if tid exists on the fifo, -1 if does not.
+ */
+struct s_TCB gThread;
+int searchForTid(PFILA2 fifo, int tid) {
+    if(FirstFila2(fifo) != 0) {
+        return -1;
+    }
+
+    gThread = *(struct s_TCB *) GetAtIteratorFila2(fifo);
+
+    if (gThread.tid == tid) {
+        return 0;
+    }
+
+    while(NextFila2(fifo) == 0) {
+        gThread = *(struct s_TCB *) GetAtIteratorFila2(fifo);
+        if (gThread.tid == tid) {
+            return 0;
+        }
+    }
+
+    return -1;
 }

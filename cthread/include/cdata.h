@@ -29,6 +29,7 @@ typedef struct s_TCB {
 	*/
 
     char stack[STACK_SIZE];
+    int cjoin_tid;
 	
 } TCB_t; 
 

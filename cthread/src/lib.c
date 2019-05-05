@@ -11,7 +11,6 @@
 #include "../include/escalonador.h"
 #include "../include/setup_lib.h"
 
-
 /***
  * FUNCOES DA CTHREADS.H
 ***/
@@ -36,7 +35,7 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
     new_thread->context.uc_stack.ss_sp = new_thread->stack; //Stack da thread
     new_thread->context.uc_stack.ss_size = sizeof(new_thread->stack);
     new_thread->prio = prio; //Salva prioridade na estrutura
-
+    new_thread->cjoin_tid = -1;
 
     makecontext(&new_thread->context, (void (*)(void)) start, 1);
 
@@ -46,7 +45,7 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
     swapcontext(&main_thread.context, &escalonador_context);
     printf("Continuou main");
 
-    return status;
+    return new_thread->tid;
 }
 
 /**
@@ -64,17 +63,15 @@ int csetprio(int tid, int prio) {
     return FUNCTION_SUCCESS;
 }
 
-
 int cyield(void) {
-
-    int control = -1;
-
     struct s_TCB *thread = (struct s_TCB *)malloc(sizeof(struct s_TCB));
     thread->prio = active_thread.prio;
     thread->tid = active_thread.tid;
+    thread->cjoin_tid = -1;
     thread->context.uc_stack.ss_sp = thread->stack;
     thread->context.uc_stack.ss_size = sizeof(thread->stack);
 
+    int control = -1;
     getcontext(&thread->context);
 
     if(control == -1) {
@@ -87,7 +84,32 @@ int cyield(void) {
 }
 
 int cjoin(int tid) {
-    return FUNCTION_NOT_IMPLEMENTED;
+    if(searchForTid(&fifoBlock, tid) == 0) {
+        return FUNCTION_ERROR;
+    }
+
+    if(searchForTid(&fifoHigh, tid) != 0 && searchForTid(&fifoMedium, tid) != 0 && searchForTid(&fifoLow, tid) != 0) {
+        return FUNCTION_ERROR;
+    }
+
+    struct s_TCB *thread = (struct s_TCB *)malloc(sizeof(struct s_TCB));
+    thread->prio = active_thread.prio;
+    thread->tid = active_thread.tid;
+    thread->context.uc_stack.ss_sp = thread->stack;
+    thread->context.uc_stack.ss_size = sizeof(thread->stack);
+    thread->cjoin_tid = tid;
+
+    int control = -1;
+
+    getcontext(&thread->context);
+
+    if(control == -1) {
+        control = 0;
+        addToBlockFifo(thread);
+        setcontext(&escalonador_context);
+    }
+
+    return FUNCTION_SUCCESS;
 }
 
 int csem_init(csem_t *sem, int count) {

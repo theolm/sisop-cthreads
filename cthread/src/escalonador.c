@@ -16,43 +16,65 @@
 
 int escalonador() {
     while (1) {
+        unblockCjoin();
         dispatcher();
     }
     return FUNCTION_SUCCESS;
 }
 
 int dispatcher() {
-
     if (FirstFila2(&fifoHigh) == 0) {
-        printf("\nfifoHigh\n");
+
         active_thread = *(struct s_TCB *) GetAtIteratorFila2(&fifoHigh);
         FirstFila2(&fifoHigh);
         DeleteAtIteratorFila2(&fifoHigh);
-        printf("\nswap context -> active thread\n");
         swapcontext(&escalonador_context, &active_thread.context);
-        printf("\nafter swap lol\n");
-        printf("\nactive_thread high\n");
+
     } else if (FirstFila2(&fifoMedium) == 0) {
-        printf("\nfifoMedium\n");
+
         active_thread = *(struct s_TCB *) GetAtIteratorFila2(&fifoMedium);
         FirstFila2(&fifoMedium);
         DeleteAtIteratorFila2(&fifoMedium);
-        printf("\nswap context -> active thread\n");
         swapcontext(&escalonador_context, &active_thread.context);
-        printf("\nafter swap\n");
-        printf("\nctive_thread medium\n");
+
     } else if (FirstFila2(&fifoLow) == 0) {
-        printf("\nfifoLow\n");
+
         active_thread = *(struct s_TCB *) GetAtIteratorFila2(&fifoLow);
         FirstFila2(&fifoLow);
         DeleteAtIteratorFila2(&fifoLow);
-        printf("\nswap context -> active thread\n");
         swapcontext(&escalonador_context, &active_thread.context);
-        printf("\nafter swap\n");
-        printf("\nctive_thread low\n");
+
     }
 
     return FUNCTION_SUCCESS;
+}
+
+
+int unblockCjoin() {
+    if(FirstFila2(&fifoBlock) == 0) {
+        struct s_TCB *block_thread = (struct s_TCB *)malloc(sizeof(struct s_TCB));
+        block_thread = (struct s_TCB *) GetAtIteratorFila2(&fifoBlock);
+
+        if(searchForTid(&fifoHigh, block_thread->cjoin_tid) != 0 && searchForTid(&fifoMedium, block_thread->cjoin_tid) != 0 && searchForTid(&fifoLow, block_thread->cjoin_tid) != 0) {
+            addThreadToFifo(block_thread, block_thread->prio);
+            DeleteAtIteratorFila2(&fifoBlock);
+            return FUNCTION_SUCCESS;
+        }
+
+        while(NextFila2(&fifoBlock) == 0) {
+            block_thread = (struct s_TCB *) GetAtIteratorFila2(&fifoBlock);
+            if(searchForTid(&fifoHigh, block_thread->cjoin_tid) != 0 && searchForTid(&fifoMedium, block_thread->cjoin_tid) != 0 && searchForTid(&fifoLow, block_thread->cjoin_tid) != 0) {
+                addThreadToFifo(block_thread, block_thread->prio);
+                DeleteAtIteratorFila2(&fifoBlock);
+                return  FUNCTION_SUCCESS;
+            }
+        }
+
+        return FUNCTION_ERROR;
+    } else {
+        return FUNCTION_ERROR;
+    }
+
 }
 
 
