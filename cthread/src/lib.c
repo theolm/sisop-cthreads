@@ -39,13 +39,18 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
 
     makecontext(&new_thread->context, (void (*)(void)) start, 1);
 
-    addThreadToFifo(new_thread, prio);
+    status += addThreadToFifo(new_thread, prio);
 
-    saveMainThread();
+    status += saveMainThread();
+
     swapcontext(&main_thread.context, &escalonador_context);
     printf("Continuou main");
 
-    return new_thread->tid;
+    if(status == 0) {
+        return new_thread->tid;
+    } else {
+        return FUNCTION_ERROR;
+    }
 }
 
 /**
@@ -74,13 +79,19 @@ int cyield(void) {
     int control = -1;
     getcontext(&thread->context);
 
+    int status = 0;
+
     if(control == -1) {
         control = 0;
-        addThreadToFifo(thread, thread->prio);
+        status += addThreadToFifo(thread, thread->prio);
         setcontext(&escalonador_context);
     }
 
-    return FUNCTION_SUCCESS;
+    if(status ==0) {
+        return FUNCTION_SUCCESS;
+    } else {
+        return FUNCTION_ERROR;
+    }
 }
 
 int cjoin(int tid) {
@@ -113,7 +124,17 @@ int cjoin(int tid) {
 }
 
 int csem_init(csem_t *sem, int count) {
-    return FUNCTION_NOT_IMPLEMENTED;
+    FILA2 fila = *(FILA2 *)malloc(sizeof(FILA2));
+    int status = CreateFila2(&fila);
+
+    sem->fila = &fila;
+    sem->count = count;
+
+    if(status == 0){
+        return FUNCTION_SUCCESS;
+    } else {
+        return FUNCTION_ERROR;
+    }
 }
 
 int cwait(csem_t *sem) {
