@@ -12,13 +12,16 @@
 
 void* fatorial(void *i) {
      int fat=1, n;
+     int i = 4;
 
-     n = *(int *)i;
 
-     for (; n < 1; --n)
+     //n = *(int *)i;
+
+     for (n = i; n > 1; n--) {
+         printf("%d\n", n);
          fat = n * fat;
-
-     printf("Fatorial de %d:\n", fat);
+     }
+     printf("Fatorial de %d: %d\n",i, fat);
      return;
 }
 
@@ -46,12 +49,12 @@ int main(int argc, char **argv) {
 	int i = 10;
 
 	id0 = ccreate(fatorial, (void *)&i, 0);
-	id1 = ccreate(fibonnaci, (void *)&i, 0);
+	//id1 = ccreate(fibonnaci, (void *)&i, 0);
 
-        printf("Threads fatorial e Fibonnaci criadas...\n");
+    //    printf("Threads fatorial e Fibonnaci criadas...\n");
 
 	cjoin(id0);
-	cjoin(id1);
+	//cjoin(id1);
 
 	printf("Main retornando para terminar o programa\n");
 }
