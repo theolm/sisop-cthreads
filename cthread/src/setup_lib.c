@@ -36,8 +36,13 @@ int saveMainThread() {
     main_thread.context.uc_stack.ss_sp = main_thread.stack; //Stack da thread
     main_thread.context.uc_stack.ss_size = sizeof(main_thread.stack);
     main_thread.prio = PRIORITY_LOW;
-    AppendFila2(&fifoLow, &main_thread);
-    return FUNCTION_SUCCESS;
+    int status = AppendFila2(&fifoLow, &main_thread);
+
+    if(status == 0) {
+        return FUNCTION_SUCCESS;
+    } else {
+        return FUNCTION_ERROR;
+    }
 }
 
 int initEscalonador() {

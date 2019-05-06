@@ -30,10 +30,13 @@ void* func2(void *arg) {
     }
 }
 
+csem_t csem;
 int main(int argc, char *argv[]) {
     int a,b;
     func_1_tid = ccreate(func1, (void *)&a, 2);
     cjoin(func_1_tid);
+    csem = *(csem_t *)malloc(sizeof(csem_t));
+    csem_init(&csem, 5);
 
     printf("\n-------------- FINAL DA MAIN -----------------\n");
     exit(0);
