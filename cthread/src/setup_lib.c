@@ -46,7 +46,6 @@ int saveMainThread() {
 }
 
 int initEscalonador() {
-    printf("\ninit Escalonador\n");
     getcontext(&escalonador_context);
     escalonador_context.uc_stack.ss_sp = escalonador_stack;
     escalonador_context.uc_stack.ss_size = sizeof(escalonador_stack);

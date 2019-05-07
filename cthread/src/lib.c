@@ -44,7 +44,6 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
     status += saveMainThread();
 
     swapcontext(&main_thread.context, &escalonador_context);
-    printf("Continuou main");
 
     if(status == 0) {
         return new_thread->tid;
