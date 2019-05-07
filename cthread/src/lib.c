@@ -58,9 +58,7 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
  **/
 int csetprio(int tid, int prio) {
     if(active_thread.tid == 0) {
-        /*Main thread nao pode alterar sua prioridade*/
-        printf("\n**********\nMain thread cant change priority\n**********\n");
-        return FUNCTION_ERROR;
+        main_thread.prio = prio;
     }
 
     active_thread.prio = prio;
@@ -136,8 +134,34 @@ int csem_init(csem_t *sem, int count) {
     }
 }
 
+/**
+ *
+ * @param sem : Pointer to the semaphore
+ * @return 0 if the semaphore have resource, 1 if the thread have to wait (block), -1 for any error.
+ */
 int cwait(csem_t *sem) {
-    return FUNCTION_NOT_IMPLEMENTED;
+    if(sem->count > 0) {
+        sem->count--;
+        return FUNCTION_SUCCESS;
+    }
+
+    struct s_TCB *thread = (struct s_TCB *)malloc(sizeof(struct s_TCB));
+    thread->prio = active_thread.prio;
+    thread->tid = active_thread.tid;
+    thread->cjoin_tid = -1;
+    thread->context.uc_stack.ss_sp = thread->stack;
+    thread->context.uc_stack.ss_size = sizeof(thread->stack);
+
+    int control = -1;
+    getcontext(&thread->context);
+
+    if(control == -1) {
+        control = 0;
+        AppendFila2(sem->fila, thread);
+        setcontext(&escalonador_context);
+    }
+
+    return 1;
 }
 
 int csignal(csem_t *sem) {
