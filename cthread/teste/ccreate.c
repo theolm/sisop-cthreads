@@ -9,8 +9,10 @@
 
 /**
  * Este teste cria 50 threads com tids diferentes, todas de alta prioridade,
- * Cada ccreate recebe a funcao que printa 10 A na tela,
- * ao retornar para main printa o tid da thread criada.
+ * Cada ccreate recebe a funcao que printa 10 A na tela.
+ * A Main thread mesmo sendo baixa prioridade nao perde execucao.
+ * Ao dar um yield a as threads de alta prioridade comecam a rodar e a main
+ * executa novamente apenas quando nao tiver mais threads de prioridade mais alta.
  */
 
 void* func(void *arg) {
@@ -33,6 +35,8 @@ int main(int argc, char *argv[]) {
         }
 
     }
+
+    cyield();
 
     printf("\n-------------- FINAL DA MAIN -----------------\n");
     exit(0);
