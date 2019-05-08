@@ -9,12 +9,11 @@
 
 
 /**
- * Esse teste cria duas threads de media prioridade, A primeira printa 100 . e a segunda 100 T.
- * Sem semaforo a execucao ficaria ..TT..TT..TT
  *
- * Para Esse teste cada funcao pede um recurso do semaforo csem. Ele tem apenas 1 recurso. Logo
- * A segunda thread deve ficar bloqueada esperando recurso liberar. A func1 libera esse recurso quando contar 90
- * Logo ela deve imprimir ainda 10 .. alternando com a thread 2.
+ * Mesmo teste com a anterior, porem com uma thread a mais que printa G.
+ * o normal seria uma sequencia de Gs no final, entretanto antes de dar o cwait
+ * a tread3 muda sua prioridade para alta, assim aquando o semaforo sinalizar liberacao de recurso
+ * a thread com maior prioridade (a que imprime G) vai ser desbloqueada primeiro.
  *
  */
 
@@ -33,7 +32,6 @@ void func1(void *arg) {
             cyield();
         }
     }
-    csignal(&csem);
 }
 
 void func2(void *arg) {
@@ -51,12 +49,29 @@ void func2(void *arg) {
     }
 }
 
+void func3(void *arg) {
+    csetprio(NULL, 0);
+    cwait(&csem);
+    int i = 0;
+    for (i = 1; i <= 100; i++) {
+        printf("G ", i);
+        if (i == 90) {
+            csignal(&csem);
+        }
+
+        if (i % 2 == 0 && i > 0) {
+            cyield();
+        }
+    }
+}
+
 int main(int argc, char *argv[]) {
 
     //Inicia semaforo
     csem_init(&csem, 1);
     int func_1_tid = ccreate(func1, (void *)&csem, 1);
     int func_2_tid = ccreate(func2, (void *)&csem, 1);
+    int func_3_tid = ccreate(func3, (void *)&csem, 1);
     cyield();
 
     

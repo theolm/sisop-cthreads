@@ -134,9 +134,7 @@ int csem_init(csem_t *sem, int count) {
  */
 int cwait(csem_t *sem) {
     if (sem->count > 0) {
-        sem->count--;
-        int firstFila = LastFila2(sem->fila);
-        printf("\nfirst fila %d\n", firstFila);
+        sem->count = sem->count - 1;
         return FUNCTION_SUCCESS;
     }
 
@@ -160,40 +158,26 @@ int cwait(csem_t *sem) {
 }
 
 int csignal(csem_t *sem) {
-    int firstFila = LastFila2(sem->fila);
-    printf("\nfirst fila %d\n", firstFila);
-
-
-
- /*   printf("\ncsignal init SEM COUNT %d\n", FirstFila2(sem->fila));
-
-//    if(FirstFila2(sem->fila) != 0) {
-//        printf("csignal saiu pq fila vazia\n");
-//        sem->count++;
-//        return FUNCTION_SUCCESS;
-//    }
+    if(FirstFila2(sem->fila) != 0) {
+        sem->count++;
+        return FUNCTION_SUCCESS;
+    }
 
     struct s_TCB *unblock_thread = (struct s_TCB *) malloc(sizeof(struct s_TCB));
-    printf("Criou estrutura\n");
 
     if (pointToFirstWithPrio(sem->fila, PRIORITY_HIGH) == 0) {
-        printf("PRIORITY_HIGH\n");
         unblock_thread = (struct s_TCB *) GetAtIteratorFila2(sem->fila);
     } else if (pointToFirstWithPrio(sem->fila, PRIORITY_MEDIUM) == 0) {
-        printf("PRIORITY_MEDIUM\n");
         unblock_thread = (struct s_TCB *) GetAtIteratorFila2(sem->fila);
     } else if (pointToFirstWithPrio(sem->fila, PRIORITY_LOW) == 0) {
-        printf("PRIORITY_LOW\n");
         unblock_thread = (struct s_TCB *) GetAtIteratorFila2(sem->fila);
     } else {
-        printf("NADA NAS FILAS\n");
         return FUNCTION_ERROR;
     }
 
-    printf("TID %d\n", unblock_thread->tid);
     DeleteAtIteratorFila2(sem->fila);
     addThreadToFifo(unblock_thread, unblock_thread->prio);
-    sem->count++;*/
+    sem->count++;
     return FUNCTION_SUCCESS;
 }
 
