@@ -15,9 +15,9 @@
  * executa novamente apenas quando nao tiver mais threads de prioridade mais alta.
  */
 
-void* func(void *arg) {
+void *func(void *arg) {
     int i;
-    for(i = 0 ; i < 10 ; i++) {
+    for (i = 0; i < 10; i++) {
         printf("A");
     }
     printf(" ");
@@ -26,14 +26,14 @@ void* func(void *arg) {
 int main(int argc, char *argv[]) {
 
     int j;
-    for(j = 0; j < 50 ; j++) {
-        int tid = ccreate(func, (void *)&j, 0);
-        if(tid > 0) {
+    for (j = 0; j < 50; j++) {
+        int tid = ccreate(func, (void *) &j, 0);
+
+        if (tid > 0) {
             printf("Thread com tid %d criada.\n", tid);
         } else {
             printf("Erro ao criar thread\n");
         }
-
     }
 
     cyield();

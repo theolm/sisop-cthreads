@@ -41,9 +41,6 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
     makecontext(&new_thread->context, (void (*)(void)) start, 1, arg);
 
     status += addThreadToFifo(new_thread, prio);
-    //status += saveMainThread();
-
-    //swapcontext(&main_thread.context, &escalonador_context);
 
     if (status == 0) {
         return new_thread->tid;
@@ -57,10 +54,6 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
  * como NULL
  **/
 int csetprio(int tid, int prio) {
-    if (active_thread.tid == 0) {
-        main_thread.prio = prio;
-    }
-
     active_thread.prio = prio;
     return FUNCTION_SUCCESS;
 }
