@@ -24,6 +24,7 @@ int addThreadToFifo(void *newThread, int prio);
 int addToBlockFifo(void *newThread);
 void printFifosStatus();
 struct s_TCB getFromFifo(int prio);
+int pointToFirstWithPrio(PFILA2 fifo, int prio);
 int searchForTid(PFILA2 fifo, int tid);
 
 #endif //CTHREAD_FIFO_MANAGER_H

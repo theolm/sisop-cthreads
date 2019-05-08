@@ -3,16 +3,16 @@ LIB_DIR=../lib
 INC_DIR=../include
 BIN_DIR=../bin
 SRC_DIR=./
-TARGETS= ccreate yield cjoin_simples ccreate_test csetprio
+TARGETS= ccreate yield cjoin_simples csem csetprio csem_com_prio
 CFLAGS = -Wall -m32 -DDEBUG
 
-all: ccreate yield cjoin_simples csetprio
+all: ccreate yield cjoin_simples csetprio csem_com_prio
 
 ccreate: ccreate.c $(LIB_DIR)/libcthread.a
 	$(CC) -g -o ccreate ccreate.c -L$(LIB_DIR) -lcthread $(CFLAGS)
 
-ccreate_test: ccreate_test.c $(LIB_DIR)/libcthread.a
-	$(CC) -g -o ccreate_test ccreate_test.c -L$(LIB_DIR) -lcthread $(CFLAGS)
+csem: csem.c $(LIB_DIR)/libcthread.a
+	$(CC) -g -o csem csem.c -L$(LIB_DIR) -lcthread $(CFLAGS)
 
 yield: yield.c $(LIB_DIR)/libcthread.a
 	$(CC) -g -o yield yield.c -L$(LIB_DIR) -lcthread $(CFLAGS)
@@ -22,6 +22,9 @@ cjoin_simples: cjoin_simples.c $(LIB_DIR)/libcthread.a
 
 csetprio: csetprio.c $(LIB_DIR)/libcthread.a
 	$(CC) -g -o csetprio csetprio.c -L$(LIB_DIR) -lcthread $(CFLAGS)
+
+csem_com_prio: csem_com_prio.c $(LIB_DIR)/libcthread.a
+	$(CC) -g -o csem_com_prio csem_com_prio.c -L$(LIB_DIR) -lcthread $(CFLAGS)
 
 clean:
 	rm -rf $(TARGETS)

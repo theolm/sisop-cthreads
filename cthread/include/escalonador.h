@@ -13,7 +13,6 @@
 ucontext_t escalonador_context;
 char escalonador_stack[STACK_SIZE];
 struct s_TCB active_thread;
-ucontext_t active_context;
 
 int escalonador();
 int dispatcher();

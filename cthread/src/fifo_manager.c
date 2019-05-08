@@ -107,3 +107,31 @@ int searchForTid(PFILA2 fifo, int tid) {
 
     return -1;
 }
+
+/**
+ * Search the fifo for a thread with the given priority.
+ * @param fifo : pointer to the fifo
+ * @param prio : desire thread Priority
+ * @return 0 if find a thread with the desire priority. The PFILA iterator will be on the right index.
+ * -1 if the fifo does not contain threads with that priority.
+ */
+int pointToFirstWithPrio(PFILA2 fifo, int prio) {
+    if(FirstFila2(fifo) != 0) {
+        return -1;
+    }
+
+    gThread = *(struct s_TCB *) GetAtIteratorFila2(fifo);
+
+    if (gThread.prio == prio) {
+        return 0;
+    }
+
+    while(NextFila2(fifo) == 0) {
+        gThread = *(struct s_TCB *) GetAtIteratorFila2(fifo);
+        if (gThread.prio == prio) {
+            return 0;
+        }
+    }
+
+    return -1;
+}

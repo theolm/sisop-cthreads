@@ -15,6 +15,7 @@
 
 int flagFifos = -1;
 int flagEscalonador = -1;
+int flagMainThread = -1;
 
 int initLibrary() {
     if (flagFifos == -1) {
@@ -27,22 +28,30 @@ int initLibrary() {
         initEscalonador();
     }
 
+    if(flagMainThread == -1) {
+        flagMainThread = 0;
+        initMainThread();
+    }
+
     return FUNCTION_SUCCESS;
 }
 
-int saveMainThread() {
-    main_thread.tid = 0;
-    main_thread.cjoin_tid = -1;
-    main_thread.context.uc_stack.ss_sp = main_thread.stack; //Stack da thread
-    main_thread.context.uc_stack.ss_size = sizeof(main_thread.stack);
-    main_thread.prio = PRIORITY_LOW;
-    int status = AppendFila2(&fifoLow, &main_thread);
+int initMainThread() {
+    active_thread.tid = 0;
+    active_thread.cjoin_tid = -1;
+    active_thread.context.uc_stack.ss_sp = active_thread.stack; //Stack da thread
+    active_thread.context.uc_stack.ss_size = sizeof(active_thread.stack);
+    active_thread.prio = PRIORITY_LOW;
 
-    if(status == 0) {
-        return FUNCTION_SUCCESS;
-    } else {
-        return FUNCTION_ERROR;
+    int control = -1;
+    getcontext(&active_thread.context);
+
+    if(control == -1) {
+        control = 0;
+        setcontext(&active_thread.context);
     }
+
+    return FUNCTION_SUCCESS;
 }
 
 int initEscalonador() {

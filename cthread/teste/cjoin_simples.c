@@ -32,6 +32,8 @@ void* funcA(void *arg) {
 int main(int argc, char *argv[]) {
     int a = ccreate(funcA, NULL, 2);
 
+    cyield();
+
     if(cjoin(a) != 0) {
         printf("\nErro ao executar cjoin\n");
     } else {
@@ -39,6 +41,10 @@ int main(int argc, char *argv[]) {
             printf("\nErro ao executar segundo cjoin\n");
         }
     }
+
+    cyield();
+    cyield();
+    cyield();
 
     printf("\n-------------- FINAL DA MAIN -----------------\n");
     exit(0);

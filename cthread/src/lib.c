@@ -17,6 +17,7 @@
 int isInit = -1;
 
 int saveMain = -1;
+
 int ccreate(void *(*start)(void *), void *arg, int prio) {
     if (isInit == -1) {
         isInit = 0;
@@ -26,7 +27,7 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
     int status = 0;
 
     /*Contexto e estrutura da thead nova*/
-    struct s_TCB *new_thread = (struct s_TCB *)malloc(sizeof(struct s_TCB));
+    struct s_TCB *new_thread = (struct s_TCB *) malloc(sizeof(struct s_TCB));
 
     new_thread->tid = Random2(); //Inicia i id da thread
     getcontext(&new_thread->context);
@@ -37,15 +38,11 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
     new_thread->prio = prio; //Salva prioridade na estrutura
     new_thread->cjoin_tid = -1;
 
-    makecontext(&new_thread->context, (void (*)(void)) start, 1);
+    makecontext(&new_thread->context, (void (*)(void)) start, 1, arg);
 
     status += addThreadToFifo(new_thread, prio);
 
-    status += saveMainThread();
-
-    swapcontext(&main_thread.context, &escalonador_context);
-
-    if(status == 0) {
+    if (status == 0) {
         return new_thread->tid;
     } else {
         return FUNCTION_ERROR;
@@ -57,18 +54,12 @@ int ccreate(void *(*start)(void *), void *arg, int prio) {
  * como NULL
  **/
 int csetprio(int tid, int prio) {
-    if(active_thread.tid == 0) {
-        /*Main thread nao pode alterar sua prioridade*/
-        printf("\n**********\nMain thread cant change priority\n**********\n");
-        return FUNCTION_ERROR;
-    }
-
     active_thread.prio = prio;
     return FUNCTION_SUCCESS;
 }
 
 int cyield(void) {
-    struct s_TCB *thread = (struct s_TCB *)malloc(sizeof(struct s_TCB));
+    struct s_TCB *thread = (struct s_TCB *) malloc(sizeof(struct s_TCB));
     thread->prio = active_thread.prio;
     thread->tid = active_thread.tid;
     thread->cjoin_tid = -1;
@@ -80,13 +71,13 @@ int cyield(void) {
 
     int status = 0;
 
-    if(control == -1) {
+    if (control == -1) {
         control = 0;
         status += addThreadToFifo(thread, thread->prio);
         setcontext(&escalonador_context);
     }
 
-    if(status ==0) {
+    if (status == 0) {
         return FUNCTION_SUCCESS;
     } else {
         return FUNCTION_ERROR;
@@ -94,15 +85,15 @@ int cyield(void) {
 }
 
 int cjoin(int tid) {
-    if(searchForTid(&fifoBlock, tid) == 0) {
+    if (searchForTid(&fifoBlock, tid) == 0) {
         return FUNCTION_ERROR;
     }
 
-    if(searchForTid(&fifoHigh, tid) != 0 && searchForTid(&fifoMedium, tid) != 0 && searchForTid(&fifoLow, tid) != 0) {
+    if (searchForTid(&fifoHigh, tid) != 0 && searchForTid(&fifoMedium, tid) != 0 && searchForTid(&fifoLow, tid) != 0) {
         return FUNCTION_ERROR;
     }
 
-    struct s_TCB *thread = (struct s_TCB *)malloc(sizeof(struct s_TCB));
+    struct s_TCB *thread = (struct s_TCB *) malloc(sizeof(struct s_TCB));
     thread->prio = active_thread.prio;
     thread->tid = active_thread.tid;
     thread->context.uc_stack.ss_sp = thread->stack;
@@ -113,7 +104,7 @@ int cjoin(int tid) {
 
     getcontext(&thread->context);
 
-    if(control == -1) {
+    if (control == -1) {
         control = 0;
         addToBlockFifo(thread);
         setcontext(&escalonador_context);
@@ -123,25 +114,71 @@ int cjoin(int tid) {
 }
 
 int csem_init(csem_t *sem, int count) {
-    FILA2 fila = *(FILA2 *)malloc(sizeof(FILA2));
+    FILA2 fila = *(FILA2 *) malloc(sizeof(FILA2));
     int status = CreateFila2(&fila);
 
     sem->fila = &fila;
     sem->count = count;
 
-    if(status == 0){
+    if (status == 0) {
         return FUNCTION_SUCCESS;
     } else {
         return FUNCTION_ERROR;
     }
 }
 
+/**
+ *
+ * @param sem : Pointer to the semaphore
+ * @return 0 if the semaphore have resource, 1 if the thread have to wait (block), -1 for any error.
+ */
 int cwait(csem_t *sem) {
-    return FUNCTION_NOT_IMPLEMENTED;
+    if (sem->count > 0) {
+        sem->count = sem->count - 1;
+        return FUNCTION_SUCCESS;
+    }
+
+    struct s_TCB *thread = (struct s_TCB *) malloc(sizeof(struct s_TCB));
+    thread->prio = active_thread.prio;
+    thread->tid = active_thread.tid;
+    thread->cjoin_tid = -1;
+    thread->context.uc_stack.ss_sp = thread->stack;
+    thread->context.uc_stack.ss_size = sizeof(thread->stack);
+
+    int control = -1;
+    getcontext(&thread->context);
+
+    if (control == -1) {
+        control = 0;
+        AppendFila2(sem->fila, thread);
+        setcontext(&escalonador_context);
+    }
+
+    return 1;
 }
 
 int csignal(csem_t *sem) {
-    return FUNCTION_NOT_IMPLEMENTED;
+    if(FirstFila2(sem->fila) != 0) {
+        sem->count++;
+        return FUNCTION_SUCCESS;
+    }
+
+    struct s_TCB *unblock_thread = (struct s_TCB *) malloc(sizeof(struct s_TCB));
+
+    if (pointToFirstWithPrio(sem->fila, PRIORITY_HIGH) == 0) {
+        unblock_thread = (struct s_TCB *) GetAtIteratorFila2(sem->fila);
+    } else if (pointToFirstWithPrio(sem->fila, PRIORITY_MEDIUM) == 0) {
+        unblock_thread = (struct s_TCB *) GetAtIteratorFila2(sem->fila);
+    } else if (pointToFirstWithPrio(sem->fila, PRIORITY_LOW) == 0) {
+        unblock_thread = (struct s_TCB *) GetAtIteratorFila2(sem->fila);
+    } else {
+        return FUNCTION_ERROR;
+    }
+
+    DeleteAtIteratorFila2(sem->fila);
+    addThreadToFifo(unblock_thread, unblock_thread->prio);
+    sem->count++;
+    return FUNCTION_SUCCESS;
 }
 
 int cidentify(char *name, int size) {
