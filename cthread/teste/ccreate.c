@@ -25,6 +25,16 @@ void *func(void *arg) {
 
 int main(int argc, char *argv[]) {
 
+    char members[100];
+
+    if(cidentify(members, 100) == 0) {
+        printf("%s\n\n", members);
+    } else {
+        printf("cidentify erro!\n\n");
+    }
+
+
+
     int j;
     for (j = 0; j < 50; j++) {
         int tid = ccreate(func, (void *) &j, 0);

@@ -16,7 +16,7 @@ INC_DIR=./include
 BIN_DIR=./bin
 SRC_DIR=./src
 TARGETS_O= ./bin/library.o ./bin/fifo_manager.o ./bin/setup_lib.o ./bin/escalonador.o
-CFLAGS = -Wall -m32 -DDEBUG
+CFLAGS = -Wall -m32
 
 all: setup_lib fifo_manager escalonador library libcthread
 
